@@ -1,7 +1,7 @@
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
 const SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state";
-const BACKEND_URL = "http://localhost:3001";
+const BACKEND_URL = "https://kanye-west-mtku.onrender.com";
 
 export function loginWithSpotify() {
   const url = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
