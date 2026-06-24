@@ -1,23 +1,6 @@
 import { useState, useEffect } from 'react'
 import { searchTrack, playTrack } from '../spotify'
 
-const ALBUM_IDS = {
-  'The College Dropout': '4fzsfWd4gO2j0eiITFbxUh',
-  'Late Registration': '7b2tLMgzD0Q3XPHLGNLHOM',
-  'Graduation': '4SZko61aMnmgvNhfhgTuD3',
-  '808s & Heartbreak': '5cP4oBtLMfBnMxTUsRHCyV',
-  'My Beautiful Dark Twisted Fantasy': '20r762YmB5HeofjMCiPMLv',
-  'Watch The Throne': '0ocMap99vLEeGkBCfCWRwS',
-  'Cruel Summer': '6ijvs54NaN3QNdXFVFtVOM',
-  'Yeezus': '7D2NdGvBHIavgLhmcwhluK',
-  'The Life of Pablo': '7gsWAHLeT0w7es6FofOXk1',
-  'ye': '2Ek1q2haOnxVqhvVKqMvJe',
-  'Kids See Ghosts': '6pwuKxMUkNg673KETsXPUV',
-  'Jesus Is King': '0FgZKfoU2Br5sHOfvZKTI9',
-  'Donda': '5cT4PNiXAMxq9XWoC87cXs',
-  'Donda 2': '1ZkGNUz1un0b3Z7EsJl3ci',
-  'Vultures 1': '4DOsPwJtokvGHEifZ6t5j6',
-}
 
 const FALLBACK_COVERS = {
   'Watch The Throne': 'https://upload.wikimedia.org/wikipedia/en/7/74/Watch_The_Throne.png',
@@ -30,14 +13,18 @@ const FALLBACK_COVERS = {
 async function fetchAlbumCovers(token, albumData) {
   const results = await Promise.all(
     albumData.map(async (album) => {
-      const id = ALBUM_IDS[album.name]
-      if (!id) return { ...album, cover: FALLBACK_COVERS[album.name] || null }
-      const res = await fetch(`https://api.spotify.com/v1/albums/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      const data = await res.json()
-      const cover = data.images?.[0]?.url || FALLBACK_COVERS[album.name] || null
-      return { ...album, cover }
+      try {
+        const res = await fetch(
+          `https://api.spotify.com/v1/search?q=${encodeURIComponent(album.name + ' Kanye West')}&type=album&limit=1`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        )
+        const data = await res.json()
+        const spotifyAlbum = data.albums?.items?.[0]
+        const cover = spotifyAlbum?.images?.[0]?.url || FALLBACK_COVERS[album.name] || null
+        return { ...album, cover }
+      } catch {
+        return { ...album, cover: FALLBACK_COVERS[album.name] || null }
+      }
     })
   )
   return results
