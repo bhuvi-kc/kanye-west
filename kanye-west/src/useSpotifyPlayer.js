@@ -32,6 +32,11 @@ export function useSpotifyPlayer(token, onDeviceReady) {
         setPosition(state.position);
         setDuration(state.duration);
 
+        // if track ended (position is 0, paused, and something was playing before)
+        if (state.position === 0 && state.paused && state.track_window.previous_tracks.length > 0) {
+          spotifyPlayer.nextTrack();
+        }
+
         if (!state.paused) {
           clearInterval(intervalRef.current);
           intervalRef.current = setInterval(() => {
